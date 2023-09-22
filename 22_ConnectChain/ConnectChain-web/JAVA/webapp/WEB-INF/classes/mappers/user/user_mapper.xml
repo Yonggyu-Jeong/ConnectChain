@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mybatis.user.user_mapper">
+
+	<select id="selectUserSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			* 
+		FROM 
+			tb_user
+		WHERE
+			USER_SEQ = #{userSeq}
+	]]>		
+	</select>
+	
+	<select id="selectUserLoginSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			* 
+		FROM 
+			tb_user
+		WHERE
+			USER_NAME = #{userName} AND 
+			USER_PASSWORD = #{userPassword} 
+	]]>		
+	</select>
+	
+	<insert id="insertUserSQL"
+		parameterType="common.collection.ABox">
+		<![CDATA[
+			INSERT INTO tb_user
+				( `USER_NAME`, 
+				`USER_NICKNAME`, 
+				`USER_PASSWORD`, 
+				`USER_PROFILE`, 
+				`USER_IMAGE_PATH`, 
+				`USER_REDATE
+			   )
+			VALUES 
+				( #{userName},
+				#{userNickName},
+				#{userPassword},
+				#{userProfile},
+				#{userImagePath},
+				NOW()
+				)
+		]]>
+	</insert>
+	
+		<select id="selectUserWishListSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			a.* 
+		FROM 
+			tb_goods a
+		WHERE
+			a.GOODS_SEQ IN (
+				SELECT 
+					b.GOODS_SEQ
+				FROM
+					tb_user_wish b 
+				WHERE
+					b.USER_SEQ = #{userSeq}
+				ORDER BY b.USER_WISH_RED_DATE DESC
+			)
+	]]>
+		<choose>
+			<when test="num != '' and num != null">
+				LIMIT
+					num, (num+10);
+			</when>
+			<otherwise>
+				LIMIT 
+					0,10;
+			</otherwise>		
+		</choose>
+	</select>
+		
+
+</mapper>

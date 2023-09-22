@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config3.0//EN"
+    "http://www.mybatis.org/dtd/mybatis-3-config.dtd">
+
+<!-- IBATIS RESOURCE CONFIGURATION -->
+<configuration>
+	<settings>
+		<setting name="jdbcTypeForNull" value="VARCHAR" />
+		<setting name="callSettersOnNulls" value="true" />
+		<setting name="returnInstanceForEmptyRow" value="true"/>
+</settings>
+
+	<mappers>
+		<mapper resource="mybatis/mappers/common/common_mapper.xml" />
+		<mapper resource="mybatis/mappers/user/user_mapper.xml" />
+		<mapper resource="mybatis/mappers/goods/goods_mapper.xml" />
+
+	</mappers>
+
+</configuration>

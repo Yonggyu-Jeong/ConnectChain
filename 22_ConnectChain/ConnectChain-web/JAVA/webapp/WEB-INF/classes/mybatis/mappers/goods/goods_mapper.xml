@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mybatis.goods.goods_mapper">
+
+	<!-- 상품 목록 조회 MyBatis -->
+	<select id="selectGoodsListSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			goods.*, wish.USER_WISH_STATE as wish
+		FROM 
+			tb_goods goods, tb_user_wish wish
+		]]>
+		<trim prefix="WHERE" prefixOverrides="AND">
+			<if test="goodsCategory != '' and goodsCategory != null">
+				goods.GOODS_CATEGORY = #{goodsCategory} AND 
+			</if>
+			<if test="goodsState != '' and goodsState != null">
+				goods.GOODS_STATE = #{goodsState} AND
+			</if>
+			<if test="search != '' and search != null">
+				(goods.GOODS_TITLE LIKE #{search} OR
+				goods.GOODS_CONTENTS LIKE #{search}) AND 
+			</if>
+			wish.USER_SEQ = #{userSeq} AND 
+			goods.USER_SEQ = wish.USER_SEQ 
+		</trim>		
+		ORDER BY
+			goods.GOODS_SEQ DESC 
+		<choose>
+			<when test="num != '' and num != null">
+				LIMIT
+					#{num}, (#{num}+10);
+			</when>
+			<otherwise>
+				LIMIT 
+					0,10;
+			</otherwise>		
+		</choose>
+	</select>
+	
+	<!-- 상품 목록 조회 MyBatis -->
+	<select id="selectGoodsSearchListSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			* 
+		FROM 
+			tb_goods 
+		]]>
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="goodsCategory != '' and goodsCategory != null">
+				GOODS_CATEGORY = #{goodsCategory}
+			</if>
+			<if test="goodsState != '' and goodsState != null">
+				GOODS_STATE = #{goodsState}
+			</if>
+			<if test="goodsSearch != '' and goodsSearch != null">
+				( GOODS_CONTENTS LIKE '%#{goodsSearch}%' OR
+				GOODS_TITLE LIKE '%#{goodsSearch}%' )
+				GOODS_STATE = #{goodsState}
+			</if>
+		</trim>	
+		ORDER BY
+			GOODS_SEQ DESC 
+		<choose>
+			<when test="num != '' and num != null">
+				LIMIT
+					num, (num+10);
+			</when>
+			<otherwise>
+				LIMIT 
+					0,10;
+			</otherwise>		
+		</choose>
+	</select>
+	
+	
+	<select id="selectGoodsSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			* 
+		FROM 
+			tb_goods 
+		WHERE
+			GOODS_SEQ = #{goodsSeq} 
+	]]>		
+	</select>
+	
+	<select id="selectWishUserSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			COUNT(*) as count
+		FROM 
+			tb_user_wish
+		WHERE
+			GOODS_SEQ = #{goodsSeq} AND USER_SEQ = #{userSeq} 
+	]]>		
+	</select>
+	
+	<select id="selectWishStateSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			COUNT(*) as count 
+		FROM 
+			tb_user_wish
+		WHERE
+			GOODS_SEQ = #{goodsSeq} AND USER_SEQ = #{userSeq} AND USER_WISH_STATE = 'WS01'
+	]]>		
+	</select>
+	
+	<select id="selectRequestSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			* 
+		FROM 
+			tb_request
+		WHERE
+			GOODS_SEQ = #{goodsSeq}
+	]]>		
+	</select>
+	
+	<select id="selectRequestUserSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			* 
+		FROM 
+			tb_request
+		WHERE
+			BUY_USER_SEQ = #{userSeq} AND GOODS_SEQ = #{goodsSeq}
+	]]>		
+	</select>
+	
+
+		<!-- 상품 목록 조회 MyBatis -->
+	<select id="selectSaleRecordListSQL"
+		resultType="common.collection.ABox"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		SELECT 
+			* 
+		FROM 
+			tb_traffic_hist 
+		WHERE
+			GOOD_SEQ = #{goodsSeq}
+		ORDER BY
+			TRAFFIC_SEQ DESC 
+	]]>		
+		<choose>
+			<when test="num != '' and num != null">
+				LIMIT
+					#{num}, #{num2};
+			</when>
+			<otherwise>
+				LIMIT 
+					0,10;
+			</otherwise>		
+		</choose>
+	</select>
+	
+	<!-- 상품 등록 MyBatis -->
+	<insert id="insertGoodsSQL"
+		parameterType="common.collection.ABox">
+		<![CDATA[
+			INSERT INTO tb_goods
+				( USER_SEQ,
+				GOODS_CATEGORY,
+				GOODS_PRICE,
+				GOODS_TITLE,
+				GOODS_CONTENTS,
+				GOODS_IMAGE_PATH_MAIN,
+				GOODS_IMAGE_PATH_1,
+				GOODS_IMAGE_PATH_2,
+				GOODS_IMAGE_PATH_3,
+				GOODS_STATE,
+				GOODS_REG_DATE
+			   )
+			VALUES 
+				( #{userSeq},
+				#{goodsCategory},
+				#{goodsPrice},
+				#{goodsTitle},
+				#{goodsContents},
+				#{goodsImagePathMain},
+				#{goodsImagePath1},
+				#{goodsImagePath2},
+				#{goodsImagePath3},
+				#{goodsState},
+				NOW()
+				)
+		]]>
+	</insert>
+	
+	<!-- 토큰 등록 MyBatis -->
+	<insert id="insertTokenSQL"
+		parameterType="common.collection.ABox">
+		<![CDATA[
+			INSERT INTO tb_token
+				( TOKEN_NAME,
+				TOKEN_ID,
+				TOKEN_ORIGINAL_FILE_NAME,
+				TOKEN_TYPE,
+				TOKEN_SIZE,
+				TOKEN_IMAGE_PATH,
+				GOODS_SEQ,
+				TOKEN_REGDATE
+			   )
+			VALUES (
+				#{tokenName},
+				#{tokenID},
+				#{tokenOriginalFileName},
+				#{tokenType},
+				#{tokenSize},
+				#{tokenImagePath},
+				#{goodsSeq},
+				NOW()
+			)
+		]]>
+	</insert>
+	
+	<!-- 상품 추적 등록 MyBatis -->
+	<insert id="insertTrafficSQL"
+		parameterType="common.collection.ABox">
+		<![CDATA[
+			INSERT INTO tb_traffic_hist
+				( GOOD_SEQ,
+				USER_SEQ,
+				TRAFFIC__PRICE,
+				TRAFFIC_IMAGE_PATH_1,
+				TRAFFIC_IMAGE_PATH_2,
+				TRAFFIC_IMAGE_PATH_3,
+				TRAFFIC_RETENTION_DATE,
+				TRAFFIC_SALE_DATE
+			   )
+			VALUES (
+				#{goodsSeq},
+				#{useSeq},
+				#{trafficPrice},
+				#{trafficImagePath1},
+				#{trafficImagePath2},
+				#{trafficImagePath3},
+				NOW(),
+				NOW()
+			)
+		]]>
+	</insert>
+	
+	<!-- 상품 좋아요 등록 MyBatis -->
+	<insert id="insertWishSQL"
+		parameterType="common.collection.ABox">
+		<![CDATA[
+			INSERT INTO tb_user_wish
+				( GOODS_SEQ,
+				USER_SEQ,
+				USER_WISH_STATE,
+				USER_WISH_RED_DATE
+			   )
+			VALUES (
+				#{goodsSeq},
+				#{userSeq},
+				#{userWishState},
+				NOW()
+			)
+		]]>
+	</insert>
+	
+	<!-- 상품 추적 등록 MyBatis -->
+	<insert id="insertRequestSQL"
+		parameterType="common.collection.ABox">
+		<![CDATA[
+			INSERT INTO tb_request
+				( GOODS_SEQ,
+				BUY_USER_SEQ,
+				REQUEST_STATE,
+				REQUEST_RED_DATE
+			   )
+			VALUES (
+				#{goodsSeq},
+				#{userSeq},
+				'RS01',
+				NOW()
+			)
+		]]>
+	</insert>
+	
+	<update id="updateRequestSQL"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		UPDATE 
+			tb_request 
+		SET 
+			REQUEST_STATE = #{requestState}
+		WHERE
+			BUY_USER_SEQ = #{userSeq} AND GOODS_SEQ = #{goodsSeq}	
+	]]>
+	</update>
+	
+	<update id="updateRequestAllSQL"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		UPDATE 
+			tb_request 
+		SET 
+			REQUEST_STATE = 'RS04'
+		WHERE
+			GOODS_SEQ = #{goodsSeq} AND  REQUEST_STATE != 'RS03'
+			
+	]]>
+	</update>
+	
+	<update id="updateUserWishSQL"
+		parameterType="common.collection.ABox">
+	<![CDATA[
+		UPDATE 
+			tb_user_wish
+		SET 
+			USER_WISH_STATE = #{userWishState}
+		WHERE
+			GOODS_SEQ = #{goodsSeq} AND USER_SEQ = #{userSeq}
+			
+	]]>
+	</update>
+	
+</mapper>

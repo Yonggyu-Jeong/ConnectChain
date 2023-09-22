@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Properties>
+    <Property name="service-name">ROOT</Property>
+    <Property name="log-path">C:\spring\GitHub\shadow\SHADOW_LOG</Property>
+    <Property name="log-pattern">[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n</Property>
+    <Property name="file-name">${log-path}/${service-name}</Property>
+    <Property name="file-pattern">${file-name}-%d{yyyy-MM-dd}</Property>
+  </Properties>
+  <Appenders>
+    
+    <Console name="console-log" target="SYSTEM_OUT">
+      <PatternLayout pattern="${log-pattern}"/>
+    </Console>
+    
+    <RollingFile name="info-log" fileName="${file-name}-info.log"
+    filePattern="${file-pattern}-%d{yyyy-MM-dd}-info.log">
+      <PatternLayout>
+        <pattern>${log-pattern}</pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+      </Policies>
+    </RollingFile>
+    
+    <RollingFile name="debug-log" fileName="${file-name}-debug.log"
+    filePattern="${file-pattern}-%d{yyyy-MM-dd}-debug.log">
+      <PatternLayout>
+        <pattern>${log-pattern}</pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+      </Policies>
+    </RollingFile>
+    
+    <RollingFile name="error-log" fileName="${file-name}-error.log"
+    filePattern="${file-pattern}-%d{yyyy-MM-dd}-error.log">
+      <PatternLayout>
+        <pattern>${log-pattern}</pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+      </Policies>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+     
+    <Logger name="org.mybatis" level="DEBUG"></Logger>
+    <Logger name="java.sql.Connection" level="DEBUG"></Logger>
+    <Logger name="java.sql.Statement" level="DEBUG"></Logger>
+    <Logger name="java.sql.PreparedStatement" level="DEBUG"></Logger>
+    <Logger name="java.sql.ResultSet" level="DEBUG"></Logger>
+    <Root level="DEBUG">
+      <appender-ref ref="info-log" level="INFO"/>
+      <appender-ref ref="debug-log" level="DEBUG"/>
+      <appender-ref ref="error-log" level="ERROR"/>
+      <appender-ref ref="console-log" level="DEBUG"/>
+    </Root>
+  </Loggers>
+</Configuration>

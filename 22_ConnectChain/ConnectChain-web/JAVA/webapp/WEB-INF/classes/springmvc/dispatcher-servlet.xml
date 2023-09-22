@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    - DispatcherServlet application context for Application's web tier.
+-->
+<beans	xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:p="http://www.springframework.org/schema/p"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="
+        		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+        		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+        		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+                
+	<!-- 자동 Bean 등록 설정 -->
+    <context:component-scan base-package="common, shadow">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Repository"/>
+    </context:component-scan>
+    
+    <!-- CustomView Resolver 설정(다중View를 사용하기 위해, 확장자가 JSP인경우 NULL을 리턴하도록 구현함) -->
+    <bean class="common.resolver.CustomViewResolver" p:order="1" 
+    		p:viewClass="org.springframework.web.servlet.view.JstlView" 
+    		p:prefix="/WEB-INF/jsp/" p:suffix=".jsp"/>
+    
+    <!-- UrlBasedViewResolver 설정(확장자가 html인 데이터도 보여줄 수 있도록 다중 뷰 구현함) -->
+    <bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" p:order="2" 
+    		p:viewClass="org.springframework.web.servlet.view.JstlView" 
+    		p:prefix="/WEB-INF/jsp/" p:suffix=".html"/>
+    		
+    <!-- Configure the multipart resolver -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="1073741824" /> <!-- 1GB -->
+		<property name="maxInMemorySize" value="1024" /> <!-- 1KB -->
+	</bean>
+    
+    <!-- PAGE Mapping Configuration -->
+	<bean id="eventCheckInterceptor" class="common.interceptor.EventCheckInterceptor" />
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter" />
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping">
+		<property name="useSuffixPatternMatch" value="true" />
+		<property name="alwaysUseFullPath" value="true" />
+		<property name="order" value="0" />
+		<property name="interceptors">
+			<ref bean="eventCheckInterceptor"/>
+		</property>
+	</bean>
+	
+	<!-- AJAX Configuration -->   
+	<bean id="jsonView" class="org.springframework.web.servlet.view.json.MappingJackson2JsonView" />
+	
+    <!-- Session Check Interceptor 설정 -->
+    <!--
+    <mvc:interceptors>
+		<mvc:interceptor>
+			<bean class="common.interceptor.SessionCheckInterceptor"></bean>
+		</mvc:interceptor>
+	</mvc:interceptors>
+	  -->
+</beans>
