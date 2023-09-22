@@ -1,0 +1,9 @@
+<%@ page pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<%-- HOME ROOT PATH SETTING --%>
+<c:set var="HOME" value="${pageContext.request.contextPath}" />
+
+<%-- JSP PATH SETTING --%>
+<c:set var="JSP" value="/WEB-INF/jsp/web" />
